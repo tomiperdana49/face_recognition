@@ -31,7 +31,7 @@ known_face_encodings = [
     albert_face_encoding
 ]
 known_face_names = [
-    "Tomi",
+    "Tomi P.",
     "Mytosin",
     "Albert"
 ]
