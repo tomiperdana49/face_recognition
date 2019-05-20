@@ -27,7 +27,7 @@ albert_face_encoding = face_recognition.face_encodings(albert_image)[0]
 # Create arrays of known face encodings and their names
 known_face_encodings = [
     tomi_face_encoding,
-    mytosin_face_encoding
+    mytosin_face_encoding,
     albert_face_encoding
 ]
 known_face_names = [
