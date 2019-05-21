@@ -13,21 +13,26 @@ import numpy as np
 video_capture = cv2.VideoCapture(0)
 
 # Load a sample picture and learn how to recognize it.
-obama_image = face_recognition.load_image_file("images/tomi.jpg")
-obama_face_encoding = face_recognition.face_encodings(obama_image)[0]
+tomi_image = face_recognition.load_image_file("images/tomi.jpg")
+tomi_face_encoding = face_recognition.face_encodings(tomi_image)[0]
 
 # Load a second sample picture and learn how to recognize it.
-biden_image = face_recognition.load_image_file("images/mytosin.jpg")
-biden_face_encoding = face_recognition.face_encodings(biden_image)[0]
+mytosin_image = face_recognition.load_image_file("images/mytosin.jpg")
+mytosin_face_encoding = face_recognition.face_encodings(mytosin_image)[0]
+
+albert_image = face_recognition.load_image_file("images/albert.jpg")
+albert_face_encoding = face_recognition.face_encodings(albert_image)[0]
 
 # Create arrays of known face encodings and their names
 known_face_encodings = [
-    obama_face_encoding,
-    biden_face_encoding
+    tomi_face_encoding,
+    mytosin_face_encoding,
+    albert_face_encoding
 ]
 known_face_names = [
-    "Tomi Perdana Putra",
-    "Mytosin"
+    "Tomi",
+    "Mytosin",
+    "Albert"
 ]
 
 while True:

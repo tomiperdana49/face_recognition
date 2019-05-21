@@ -1,6 +1,7 @@
 import face_recognition
 import cv2
 import numpy as np
+import mysql.connector as mariadb
 
 # This is a demo of running face recognition on live video from your webcam. It's a little more complicated than the
 # other example, but it includes some basic performance tweaks to make things run a lot faster:
@@ -14,27 +15,51 @@ import numpy as np
 # Get a reference to webcam #0 (the default one)
 video_capture = cv2.VideoCapture(0)
 
-# Load a sample picture and learn how to recognize it.
-tomi_image = face_recognition.load_image_file("images/tomi.jpg")
-tomi_face_encoding = face_recognition.face_encodings(tomi_image)[0]
+# connect to mysql mariadb
+mariadb_connection = mariadb.connect(user='root', password='', database='face_recognition')
+cursor = mariadb_connection.cursor()
 
-# Load a second sample picture and learn how to recognize it.
-mytosin_image = face_recognition.load_image_file("images/mytosin.jpg")
-mytosin_face_encoding = face_recognition.face_encodings(mytosin_image)[0]
+#retrieving information
+cursor.execute("SELECT firstname,lastname,image FROM employees")
 
-albert_image = face_recognition.load_image_file("images/albert.jpg")
-albert_face_encoding = face_recognition.face_encodings(albert_image)[0]
-# Create arrays of known face encodings and their names
-known_face_encodings = [
-    tomi_face_encoding,
-    mytosin_face_encoding,
-    albert_face_encoding
-]
-known_face_names = [
-    "Tomi P.",
-    "Mytosin",
-    "Albert"
-]
+# #loop employees
+# for firstname, lastname, image in cursor:
+#     print("First name: {}, Last name: {}, Image: {}".format(firstname,lastname,image))
+# 
+# # Load a sample picture and learn how to recognize it.
+# tomi_image = face_recognition.load_image_file("images/tomi.jpg")
+# tomi_face_encoding = face_recognition.face_encodings(tomi_image)[0]
+# 
+# # Load a second sample picture and learn how to recognize it.
+# mytosin_image = face_recognition.load_image_file("images/mytosin.jpg")
+# mytosin_face_encoding = face_recognition.face_encodings(mytosin_image)[0]
+# 
+# albert_image = face_recognition.load_image_file("images/albert.jpg")
+# albert_face_encoding = face_recognition.face_encodings(albert_image)[0]
+# 
+# ali_image = face_recognition.load_image_file("images/ali.jpg")
+# ali_face_encoding = face_recognition.face_encodings(ali_image)[0]
+# # Create arrays of known face encodings and their names
+# known_face_encodings = [
+#     tomi_face_encoding,
+#     mytosin_face_encoding,
+#     albert_face_encoding,
+#     ali_face_encoding
+# ]
+# known_face_names = [
+#     "Tomi",
+#     "Mytosin",
+#     "Albert",
+#     "Ali"
+# ]
+
+known_face_encodings = []
+known_face_names = []
+for firstname, lastname, image in cursor:
+    image = face_recognition.load_image_file("images/{}".format(image))
+    face_image = face_recognition.face_encodings(image)[0]
+    known_face_encodings.append(face_image)
+    known_face_names.append(firstname)
 
 # Initialize some variables
 face_locations = []
@@ -61,8 +86,8 @@ while True:
         face_names = []
         for face_encoding in face_encodings:
             # See if the face is a match for the known face(s)
-            matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-            name = "Unknown/Ghost"
+            matches = face_recognition.compare_faces(known_face_encodings, face_encoding, 0.5)
+            name = "Unknown"
 
             # # If a match was found in known_face_encodings, just use the first one.
             # if True in matches:
