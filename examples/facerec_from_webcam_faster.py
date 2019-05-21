@@ -1,6 +1,7 @@
 import face_recognition
 import cv2
 import numpy as np
+import mysql.connector as mariadb
 
 # This is a demo of running face recognition on live video from your webcam. It's a little more complicated than the
 # other example, but it includes some basic performance tweaks to make things run a lot faster:
@@ -14,27 +15,20 @@ import numpy as np
 # Get a reference to webcam #0 (the default one)
 video_capture = cv2.VideoCapture(0)
 
-# Load a sample picture and learn how to recognize it.
-tomi_image = face_recognition.load_image_file("images/tomi.jpg")
-tomi_face_encoding = face_recognition.face_encodings(tomi_image)[0]
+mariadb_connection = mariadb.connect(user='root', password='', database='face_recognation')
+cursor = mariadb_connection.cursor()
+cursor.execute("SELECT name, image FROM Employees")
 
-# Load a second sample picture and learn how to recognize it.
-mytosin_image = face_recognition.load_image_file("images/mytosin.jpg")
-mytosin_face_encoding = face_recognition.face_encodings(mytosin_image)[0]
 
-albert_image = face_recognition.load_image_file("images/albert.jpg")
-albert_face_encoding = face_recognition.face_encodings(albert_image)[0]
-# Create arrays of known face encodings and their names
-known_face_encodings = [
-    tomi_face_encoding,
-    mytosin_face_encoding,
-    albert_face_encoding
-]
-known_face_names = [
-    "Tomi P.",
-    "Mytosin",
-    "Albert"
-]
+known_face_encodings = []
+known_face_names = []
+
+for name, image in cursor:
+   encoding = face_recognition.load_image_file(image)
+   face_encoding = face_recognition.face_encodings(encoding)[0]
+   known_face_encodings.append(face_encoding)
+   known_face_names.append(name)
+
 
 # Initialize some variables
 face_locations = []
@@ -45,7 +39,6 @@ process_this_frame = True
 while True:
     # Grab a single frame of video
     ret, frame = video_capture.read()
-
     # Resize frame of video to 1/4 size for faster face recognition processing
     small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
 
@@ -62,7 +55,7 @@ while True:
         for face_encoding in face_encodings:
             # See if the face is a match for the known face(s)
             matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-            name = "Unknown/Ghost"
+            name = "Unknown"
 
             # # If a match was found in known_face_encodings, just use the first one.
             # if True in matches:
@@ -72,10 +65,13 @@ while True:
             # Or instead, use the known face with the smallest distance to the new face
             face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
             best_match_index = np.argmin(face_distances)
+            print(face_distances)
+            print(best_match_index)
             if matches[best_match_index]:
                 name = known_face_names[best_match_index]
 
             face_names.append(name)
+            print(name)
 
     process_this_frame = not process_this_frame
 
