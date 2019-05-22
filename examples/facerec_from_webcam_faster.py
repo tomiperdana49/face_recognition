@@ -2,6 +2,7 @@ import face_recognition
 import cv2
 import numpy as np
 import mysql.connector as mariadb
+import time
 
 import time
 
@@ -92,7 +93,7 @@ while True:
         face_names = []
         for face_encoding in face_encodings:
             # See if the face is a match for the known face(s)
-            matches = face_recognition.compare_faces(known_face_encodings, face_encoding, 0.5)
+            matches = face_recognition.compare_faces(known_face_encodings, face_encoding, tolerance=0.4)
             name = "Unknown"
 
             # # If a match was found in known_face_encodings, just use the first one.
@@ -144,7 +145,6 @@ while True:
 
             # Draw a label with a name below the face
             cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
-
         font = cv2.FONT_HERSHEY_DUPLEX
 
         cv2.putText(frame, name , (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
@@ -152,6 +152,7 @@ while True:
 
     # Display the resulting image
     cv2.imshow('Video', frame)
+    mariadb_connection.close()
 
     # Hit 'q' on the keyboard to quit!
     if cv2.waitKey(1) & 0xFF == ord('q'):
