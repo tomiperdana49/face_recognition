@@ -13,24 +13,24 @@ import numpy as np
 video_capture = cv2.VideoCapture(0)
 
 # Load a sample picture and learn how to recognize it.
-tomi_image = face_recognition.load_image_file("images/tomi.jpg")
-tomi_face_encoding = face_recognition.face_encodings(tomi_image)[0]
+# tomi_image = face_recognition.load_image_file("images/tomi-perdana-putra.png")
+# tomi_face_encoding = face_recognition.face_encodings(tomi_image)[0]
 
 # Load a second sample picture and learn how to recognize it.
 mytosin_image = face_recognition.load_image_file("images/mytosin.jpg")
 mytosin_face_encoding = face_recognition.face_encodings(mytosin_image)[0]
 
-albert_image = face_recognition.load_image_file("images/albert.jpg")
+albert_image = face_recognition.load_image_file("images/albert-andika-tarigan.png")
 albert_face_encoding = face_recognition.face_encodings(albert_image)[0]
 
 # Create arrays of known face encodings and their names
 known_face_encodings = [
-    tomi_face_encoding,
+    # tomi_face_encoding,
     mytosin_face_encoding,
     albert_face_encoding
 ]
 known_face_names = [
-    "Tomi",
+    #"Tomi",
     "Mytosin",
     "Albert"
 ]
@@ -49,20 +49,20 @@ while True:
     # Loop through each face in this frame of video
     for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
         # See if the face is a match for the known face(s)
-        matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
+        matches = face_recognition.compare_faces(known_face_encodings, face_encoding, 0.5)
 
         name = "Unknown"
 
         # If a match was found in known_face_encodings, just use the first one.
-        # if True in matches:
-        #     first_match_index = matches.index(True)
-        #     name = known_face_names[first_match_index]
+        if True in matches:
+            first_match_index = matches.index(True)
+            name = known_face_names[first_match_index]
 
         # Or instead, use the known face with the smallest distance to the new face
-        face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
-        best_match_index = np.argmin(face_distances)
-        if matches[best_match_index]:
-            name = known_face_names[best_match_index]
+        # face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
+        # best_match_index = np.argmin(face_distances)
+        # if matches[best_match_index]:
+        #     name = known_face_names[best_match_index]
 
         # Draw a box around the face
         cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
