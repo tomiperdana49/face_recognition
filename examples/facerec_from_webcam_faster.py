@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import mysql.connector as mariadb
 import time
+from datetime import datetime
 
 import time
 
@@ -24,15 +25,17 @@ mariadb_connection = mariadb.connect(user='root', password='', database='face_re
 cursor = mariadb_connection.cursor()
 
 #retrieving information
-cursor.execute("SELECT firstname,image FROM employees")
+cursor.execute("SELECT id,firstname,image FROM employees")
 
 known_face_encodings = []
 known_face_names = []
-for firstname, image in cursor:
+employee_id = []
+for id, firstname, image in cursor:
     image = face_recognition.load_image_file("images/{}".format(image))
     face_image = face_recognition.face_encodings(image)[0]
     known_face_encodings.append(face_image)
     known_face_names.append(firstname)
+    employee_id.append(id)
 
 # Initialize some variables
 face_locations = []
@@ -43,6 +46,7 @@ start = 0
 timer = time.time()
 name_show = "Unknown"
 show = 0
+eventId = "001"
 while True:
 
     # Grab a single frame of video
@@ -56,7 +60,7 @@ while True:
     # Only process every other frame of video to save time
     if process_this_frame:
         # Find all the faces and face encodings in the current frame of video
-        face_locations = face_recognition.face_locations(rgb_small_frame)
+        face_locations = face_recognition.face_locations(rgb_small_frame, number_of_times_to_upsample=2)
         face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
         face_names = []
@@ -110,6 +114,11 @@ while True:
             # Draw a label with a name below the face
             cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 255, 0), cv2.FILLED)
             cv2.putText(frame, "Success" , (left + 6, top - 3), font, 1.0, (255, 255, 255), 1)
+            try:
+                cursor.execute("INSERT IGNORE INTO absen (event_id,employee_id,input_time) VALUES (%s,%s,%s)", (eventId, employee_id[best_match_index],datetime.today().strftime('%Y-%m-%d %H:%I:%S')))
+            except mariadb.Error as error:
+                print("Error: {}".format(error))
+            mariadb_connection.commit()
         else:
             # Draw a box around the face
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
@@ -122,7 +131,6 @@ while True:
 
     # Display the resulting image
     cv2.imshow('Video', frame)
-    mariadb_connection.close()
 
     # Hit 'q' on the keyboard to quit!
     if cv2.waitKey(1) & 0xFF == ord('q'):
