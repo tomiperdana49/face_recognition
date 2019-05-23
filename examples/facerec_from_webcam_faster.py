@@ -4,6 +4,7 @@ import numpy as np
 import mysql.connector as mariadb
 import time
 from datetime import datetime
+import json_tricks
 
 import time
 
@@ -25,14 +26,15 @@ mariadb_connection = mariadb.connect(user='root', password='', database='face_re
 cursor = mariadb_connection.cursor()
 
 #retrieving information
-cursor.execute("SELECT id,firstname,image FROM employees")
+cursor.execute("SELECT id,firstname,image, distance FROM employees")
 
 known_face_encodings = []
 known_face_names = []
 employee_id = []
-for id, firstname, image in cursor:
-    image = face_recognition.load_image_file("images/{}".format(image))
-    face_image = face_recognition.face_encodings(image)[0]
+for id, firstname, image, distance in cursor:
+    #image = face_recognition.load_image_file("images/{}".format(image))
+    #face_image = face_recognition.face_encodings(image)[0]
+    face_image = json_tricks.loads(distance)['distance']
     known_face_encodings.append(face_image)
     known_face_names.append(firstname)
     employee_id.append(id)
@@ -66,7 +68,7 @@ while True:
         face_names = []
         for face_encoding in face_encodings:
             # See if the face is a match for the known face(s)
-            matches = face_recognition.compare_faces(known_face_encodings, face_encoding, tolerance=0.39)
+            matches = face_recognition.compare_faces(known_face_encodings, face_encoding, tolerance=0.4)
             name = "Unknown"
 
             # # If a match was found in known_face_encodings, just use the first one.
@@ -101,7 +103,7 @@ while True:
         right *= 4
         bottom *= 4
         left *= 4
-        if start >= 3:
+        if start >= 5:
             # Draw a box around the face
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
 
