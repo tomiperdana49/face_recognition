@@ -60,13 +60,13 @@ while True:
     # Only process every other frame of video to save time
     if process_this_frame:
         # Find all the faces and face encodings in the current frame of video
-        face_locations = face_recognition.face_locations(rgb_small_frame, number_of_times_to_upsample=2)
+        face_locations = face_recognition.face_locations(rgb_small_frame)
         face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
         face_names = []
         for face_encoding in face_encodings:
             # See if the face is a match for the known face(s)
-            matches = face_recognition.compare_faces(known_face_encodings, face_encoding, tolerance=0.4)
+            matches = face_recognition.compare_faces(known_face_encodings, face_encoding, tolerance=0.39)
             name = "Unknown"
 
             # # If a match was found in known_face_encodings, just use the first one.
@@ -80,17 +80,11 @@ while True:
             if matches[best_match_index]:
                 name = known_face_names[best_match_index]
                 name_show = name
-            if name == "Unknown":
+            if name == "Unknown" or name != name_show:
                 start = 0
                 timer = time.time()
-
             elif name == name_show:
                 start = time.time() - timer
-
-            else:
-
-                start = 0
-                timer = time.time()
 
             face_names.append(name)
 
@@ -126,6 +120,9 @@ while True:
             # Draw a label with a name below the face
             cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
             cv2.putText(frame, str(round(start)) , (right - 4, top - 3), font, 1.0, (255, 255, 255), 1)
+            if name != name_show:
+                start = 0
+                timer = time.time()
 
         cv2.putText(frame, name , (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
