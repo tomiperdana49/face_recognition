@@ -25,13 +25,17 @@ mariadb_connection = mariadb.connect(user='root', password='', database='face_re
 
 cursor_event = mariadb_connection.cursor()
 cursor_event.execute("SELECT event_id, event_name, event_location FROM event")
+eventsId = []
 for row in cursor_event:
+    eventsId.append(row[0])
     print('Event ID: ' + row[0])
     print('Event Name: ' + row[1])
     print('Event Location: ' + row[2])
     print()
 
-eventId = input('Pilih event_id:')
+eventId = ""
+while eventId not in eventsId:
+    eventId = input('Pilih event_id:')
 # Get a reference to webcam #0 (the default one)
 video_capture = cv2.VideoCapture(0)
 cursor = mariadb_connection.cursor()
