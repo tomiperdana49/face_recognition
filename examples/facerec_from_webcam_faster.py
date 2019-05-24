@@ -82,15 +82,16 @@ while True:
             best_match_index = np.argmin(face_distances)
             if matches[best_match_index]:
                 name = known_face_names[best_match_index]
-                name_show = name
-            if name == "Unknown" or name != name_show:
+            if name_show == "Unknown" or name != name_show:
                 start = 0
                 timer = time.time()
             elif name == name_show:
                 start = time.time() - timer
-
+            name_show = name
             face_names.append(name)
-
+        if not face_encodings:
+            start = 0
+            timer = time.time()
 
 
     process_this_frame = not process_this_frame
@@ -108,7 +109,7 @@ while True:
             cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 255, 0), cv2.FILLED)
             cv2.putText(frame, "Present" , (left + 6, top - 3), font, 1.0, (255, 255, 255), 1)
         else:
-            if start >= 5:
+            if start >= 3:
                 # Draw a box around the face
                 cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
 
@@ -128,9 +129,6 @@ while True:
                 # Draw a label with a name below the face
                 cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
                 cv2.putText(frame, str(round(start)) , (right - 4, top - 3), font, 1.0, (255, 255, 255), 1)
-                if name != name_show:
-                    start = 0
-                    timer = time.time()
 
         cv2.putText(frame, name , (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
