@@ -113,7 +113,8 @@ if(isset($_POST['save'])){
     
     $sql="INSERT INTO event (event_id,event_name,event_location,event_start,event_end) VALUES ('$id','$a','$b','$c','$d')";
     if ($conn->query($sql) === TRUE) {
-        header("Refresh:0; url=index.php?page=event");
+        // header("Refresh:0; url=index.php?page=event");
+        echo "<meta http-equiv='refresh' content='0'>";
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
