@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
-$database="face_recognation";
+$database="face_recognition";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $database);

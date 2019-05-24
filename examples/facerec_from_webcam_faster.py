@@ -22,7 +22,7 @@ video_capture = cv2.VideoCapture(0)
 
 
 # connect to mysql mariadb
-mariadb_connection = mariadb.connect(user='root', password='', database='face_recognation')
+mariadb_connection = mariadb.connect(user='root', password='', database='face_recognition')
 cursor = mariadb_connection.cursor()
 
 #retrieving information
