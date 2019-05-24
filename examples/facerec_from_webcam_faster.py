@@ -17,12 +17,23 @@ import time
 # OpenCV is *not* required to use the face_recognition library. It's only required if you want to run this
 # specific demo. If you have trouble installing it, try any of the other demos that don't require it instead.
 
-# Get a reference to webcam #0 (the default one)
-video_capture = cv2.VideoCapture(0)
+
 
 
 # connect to mysql mariadb
 mariadb_connection = mariadb.connect(user='root', password='', database='face_recognition')
+
+cursor_event = mariadb_connection.cursor()
+cursor_event.execute("SELECT event_id, event_name, event_location FROM event")
+for row in cursor_event:
+    print('Event ID: ' + row[0])
+    print('Event Name: ' + row[1])
+    print('Event Location: ' + row[2])
+    print()
+
+eventId = input('Pilih event_id:')
+# Get a reference to webcam #0 (the default one)
+video_capture = cv2.VideoCapture(0)
 cursor = mariadb_connection.cursor()
 
 #retrieving information
@@ -48,7 +59,7 @@ start = 0
 timer = time.time()
 name_show = "Unknown"
 show = 0
-eventId = "001"
+#eventId = "001"
 dataScan = []
 while True:
 
