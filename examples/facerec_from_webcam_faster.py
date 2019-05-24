@@ -49,6 +49,7 @@ timer = time.time()
 name_show = "Unknown"
 show = 0
 eventId = "001"
+dataScan = []
 while True:
 
     # Grab a single frame of video
@@ -94,7 +95,6 @@ while True:
 
     process_this_frame = not process_this_frame
 
-
     # Display the results
     for (top, right, bottom, left), name in zip(face_locations, face_names):
         font = cv2.FONT_HERSHEY_DUPLEX
@@ -103,28 +103,34 @@ while True:
         right *= 4
         bottom *= 4
         left *= 4
-        if start >= 5:
-            # Draw a box around the face
+        if employee_id[best_match_index] in dataScan:
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
-
-            # Draw a label with a name below the face
             cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 255, 0), cv2.FILLED)
-            cv2.putText(frame, "Success" , (left + 6, top - 3), font, 1.0, (255, 255, 255), 1)
-            try:
-                cursor.execute("INSERT IGNORE INTO absen (event_id,employee_id,input_time) VALUES (%s,%s,%s)", (eventId, employee_id[best_match_index],datetime.today().strftime('%Y-%m-%d %H:%I:%S')))
-            except mariadb.Error as error:
-                print("Error: {}".format(error))
-            mariadb_connection.commit()
+            cv2.putText(frame, "Present" , (left + 6, top - 3), font, 1.0, (255, 255, 255), 1)
         else:
-            # Draw a box around the face
-            cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+            if start >= 5:
+                # Draw a box around the face
+                cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
 
-            # Draw a label with a name below the face
-            cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
-            cv2.putText(frame, str(round(start)) , (right - 4, top - 3), font, 1.0, (255, 255, 255), 1)
-            if name != name_show:
-                start = 0
-                timer = time.time()
+                # Draw a label with a name below the face
+                cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 255, 0), cv2.FILLED)
+                cv2.putText(frame, "Success" , (left + 6, top - 3), font, 1.0, (255, 255, 255), 1)
+                try:
+                    cursor.execute("INSERT IGNORE INTO absen (event_id,employee_id,input_time) VALUES (%s,%s,%s)", (eventId, employee_id[best_match_index],datetime.today().strftime('%Y-%m-%d %H:%I:%S')))
+                    dataScan.append(employee_id[best_match_index])
+                except mariadb.Error as error:
+                    print("Error: {}".format(error))
+                mariadb_connection.commit()
+            else:
+                # Draw a box around the face
+                cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+
+                # Draw a label with a name below the face
+                cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+                cv2.putText(frame, str(round(start)) , (right - 4, top - 3), font, 1.0, (255, 255, 255), 1)
+                if name != name_show:
+                    start = 0
+                    timer = time.time()
 
         cv2.putText(frame, name , (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
